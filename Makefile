@@ -49,7 +49,8 @@ CONFIG_EXT_CLK = n
 CONFIG_FTP_PROTECT = n
 CONFIG_WOWLAN = n
 
-CONFIG_PLATFORM_I386_PC = y
+CONFIG_PLATFORM_I386_PC = n
+CONFIG_PLATFORM_ARM_BCM2708 = y
 CONFIG_PLATFORM_ANDROID_X86 = n
 CONFIG_PLATFORM_JB_X86 = n
 CONFIG_PLATFORM_ARM_S3C2K4 = n
@@ -643,6 +644,14 @@ ifeq ($(CONFIG_RTL8188E), y)
 ifeq ($(CONFIG_WOWLAN), y)
 EXTRA_CFLAGS += -DCONFIG_WOWLAN
 endif
+endif
+
+ifeq ($(CONFIG_PLATFORM_ARM_BCM2708), y) 
+EXTRA_CFLAGS += -DCONFIG_LITTLE_ENDIAN
+ARCH := arm
+CROSS_COMPILE := /usr/src/tools/arm-bcm2708/arm-bcm2708-linux-gnueabi/bin/arm-bcm2708-linux-gnueabi-
+KVER  := $(shell uname -r)
+KSRC := /opt/raspbmc/linux-rpi-3.10.y
 endif
 
 ifeq ($(CONFIG_PLATFORM_I386_PC), y)

@@ -13,13 +13,21 @@ kernels >= 3.10 due to a change in the proc entry API, specifically the
 deprecation of the `create_proc_entry()` and `create_proc_read_entry()`
 functions in favor of the new `proc_create()` function.
 
-### Building
+### Building using crosscompiling on arm-bcm2708 prepare using
+#First we need to install the needed packages (Ubuntu example)
+$ apt-get install gcc-arm-linux-gnueabi make ncurses-dev
+
+#Download compilation tools from the official raspberry pi github
+$ cd /usr/src
+$ git clone --depth 5 https://github.com/raspberrypi/tools.git
+$ cd tools
+$ ln -s /usr/src/tools/arm-bcm2708/arm-bcm2708-linux-gnueabi/bin/arm-bcm2708-linux-gnueabi-gcc /usr/bin/arm-bcm2708-linux-gnueabi-gcc
 
 The driver is build by running `make`, and can be tested by loading the
 built module using `insmod`:
 
 ```sh
-$ make
+$ make -j6 ARCH=arm CROSS_COMPILE=/usr/src/tools/arm-bcm2708/arm-bcm2708hardfp-linux-gnueabi/bin/arm-bcm2708hardfp-linux-gnueabi-
 $ sudo insmod 8812au.ko
 ```
 

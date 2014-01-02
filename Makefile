@@ -651,7 +651,7 @@ EXTRA_CFLAGS += -DCONFIG_LITTLE_ENDIAN
 ARCH := arm
 CROSS_COMPILE := /usr/src/tools/arm-bcm2708/arm-bcm2708-linux-gnueabi/bin/arm-bcm2708-linux-gnueabi-
 KVER  := $(shell uname -r)
-KSRC := /opt/raspbmc/linux-rpi-3.10.y
+KSRC := /opt/raspberry/linux
 endif
 
 ifeq ($(CONFIG_PLATFORM_I386_PC), y)

@@ -1,20 +1,18 @@
-##!/bin/bash
-echo "####################################"
-echo
-echo "         PLEASE RUN AS ROOT"
-echo
-echo "####################################"
-echo ""
-#First we need to install the needed packages
-apt-get install gcc-arm-linux-gnueabi make ncurses-dev
-
-#Download compilation tools from the official raspberry pi github
-git clone --depth 5 https://github.com/raspberrypi/tools.git /usr/src
-
-#Download the official kernel from the Raspberry Pi github
-mkdir /opt/raspberry
-git clone -b rpi-3.10.y --depth 5 git://github.com/raspberrypi/linux.git /opt/raspberry
-
-# AND BAM HERE WE GO
-make clean
-make -j6 ARCH=arm CROSS_COMPILE=/usr/src/tools/arm-bcm2708/arm-bcm2708-linux-gnueabi/bin/arm-bcm2708-linux-gnueabi-
+cd /home/pi
+wget --no-check-certificate https://codeload.github.com/raspberrypi/linux/tar.gz/rpi-3.10.y
+tar -xzf rpi-3.10.y.tar.gz
+rm rpi-3.10.y.tar.gz
+cd linux-rpi-3.10.y
+make mrproper
+zcat /proc/config.gz > .config
+cp .config .config.org
+sed -i 's/^CONFIG_CROSS_COMPILE.*/CONFIG_CROSS_COMPILE=""/' .config
+make modules_prepare
+cp /lib/modules/$(uname -r)/build/Module.symvers .
+cd /home/pi
+git clone https://github.com/sblommers/rpi-linux-rtl8812au
+cd rpi-linux-rtl8812au
+make
+sudo insmod 8812au.ko
+sudo cp 8812au.ko /lib/modules/$(uname -r)/kernel/drivers/net/wireless
+sudo depmod

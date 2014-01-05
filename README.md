@@ -1,41 +1,43 @@
 ## Realtek 802.11ac (rtl8812au)
 
-This is a fork of the Realtek 802.11ac (rtl8812au) v4.2.2 (7502.20130507)
+This is a re-fork of the Realtek 802.11ac (rtl8812au) v4.2.2 (7502.20130507) for the RPi
+
 driver altered to build on Linux kernel version >= 3.10.
+-> driver altered to build on Raspberry Pi with above Linux kernel (disabled power savings!, not working)
 
 ### Purpose
 
-My D-Link DWA-171 wireless dual-band USB adapter needs the Realtek 8812au
+My Sitecom WLA-7100 wireless dual-band USB adapter needs the Realtek 8812au
 driver to work under Linux.
 
 The current rtl8812au version (per nov. 20th 2013) doesn't compile on Linux
 kernels >= 3.10 due to a change in the proc entry API, specifically the
 deprecation of the `create_proc_entry()` and `create_proc_read_entry()`
-functions in favor of the new `proc_create()` function.
+functions in favor of the new `proc_create()` function. 
 
-### Building using crosscompiling on arm-bcm2708 prepare using
-#First we need to install the needed packages (Ubuntu example)
-$ apt-get install gcc-arm-linux-gnueabi make ncurses-dev
+Disabling process-proc is also an option.
 
-#Download compilation tools from the official raspberry pi github
-$ cd /usr/src
-$ git clone --depth 5 https://github.com/raspberrypi/tools.git
-
-#Download the official kernel from the Raspberry Pi github
-$ mkdir /opt/raspberry
-$ cd /opt/raspberry
-$ git clone -b rpi-3.10.y --depth 5 git://github.com/raspberrypi/linux.git
-$ cd /opt/raspberry/linux
-
-The driver is build by running `make`, and can be tested by loading the
-built module using `insmod`:
-
+### Building (you may customize this to your settings)
 ```sh
-$ make -j6 ARCH=arm CROSS_COMPILE=/usr/src/tools/arm-bcm2708/arm-bcm2708-linux-gnueabi/bin/arm-bcm2708-linux-gnueabi-
+$ cd /home/pi
+$ wget --no-check-certificate https://codeload.github.com/raspberrypi/linux/tar.gz/rpi-3.10.y
+$ tar -xzf rpi-3.10.y.tar.gz
+$ rm rpi-3.10.y.tar.gz
+$ cd linux-rpi-3.10.y
+$ make mrproper
+$ zcat /proc/config.gz > .config
+$ cp .config .config.org
+$ sed -i 's/^CONFIG_CROSS_COMPILE.*/CONFIG_CROSS_COMPILE=""/' .config
+$ make modules_prepare
+$ cp /lib/modules/$(uname -r)/build/Module.symvers .
+$ cd /home/pi
+$ git clone https://github.com/sblommers/rpi-linux-rtl8812au
+$ cd rpi-linux-rtl8812au
+$ make
 $ sudo insmod 8812au.ko
+$ sudo cp 8812au.ko /lib/modules/$(uname -r)/kernel/drivers/net/wireless
+$ sudo depmod
 ```
-
-After loading the module, a wireless network interface named __Realtek 802.11n WLAN Adapter__ should be available.
 
 ### Installing
 
@@ -51,6 +53,6 @@ The driver module should now be loaded automatically.
 
 ### References
 
-- D-Link DWA-171
-  - [D-Link page](http://www.dlink.com/no/nb/home-solutions/connect/adapters/dwa-171-wireless-ac-dual-band-usb-adapter)
-  - [wikidevi page](http://wikidevi.com/wiki/D-Link_DWA-171_rev_A1)
+- Sitecom 
+  - [Product page](http://www.sitecom.com/en/wi-fi-usb-30-adapter-ac1200/wla-7100/p/1617)
+  - [wikidevi page](http://wikidevi.com/wiki/Sitecom_WLA-7100)
